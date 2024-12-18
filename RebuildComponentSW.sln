@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.35431.46
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RebuildComponentSW", "RebuildComponentSW\RebuildComponentSW.csproj", "{DDF288D3-446E-412E-9DB1-313CF78073E8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DDF288D3-446E-412E-9DB1-313CF78073E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDF288D3-446E-412E-9DB1-313CF78073E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDF288D3-446E-412E-9DB1-313CF78073E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDF288D3-446E-412E-9DB1-313CF78073E8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4AC9F176-9C06-423D-9A76-05006BFE228C}
+	EndGlobalSection
+EndGlobal
