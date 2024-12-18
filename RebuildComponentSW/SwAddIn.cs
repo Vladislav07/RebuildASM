@@ -45,7 +45,9 @@ namespace RebuildComponentSW
     public class SwAddIn:SwAddInEx
     {
         private IDocumentsHandler<DocumentHandler> swDocsHandler;
-
+        public List<FileRef> list=null;
+        private AssemblyTraversal tree = null;
+        ModelDoc2 model = null;
         public override bool OnConnect()
         {
              AddCommandGroup<Commands_e>(OnCommandClick, OnCommandEnable);
@@ -90,6 +92,10 @@ namespace RebuildComponentSW
             {
                 case Commands_e.CmdBuild:
                     App.SendMsgToUser("Command1 clicked!");
+                    list = new List<FileRef>();
+                    if (model == null) return;
+                    tree = new AssemblyTraversal(model);
+                    tree.Main(ref list);
                     break;
 
     
@@ -103,8 +109,10 @@ namespace RebuildComponentSW
 
         private void OnActivated(DocumentHandler docHandler)
         {
+
             App.SendMsgToUser2($"'{docHandler.Model.GetTitle()}' activated",
                 (int)swMessageBoxIcon_e.swMbInformation, (int)swMessageBoxBtn_e.swMbOk);
+            model = (ModelDoc2)docHandler.Model;
         }
 
         private void OnDestroyed(DocumentHandler handler)
@@ -115,6 +123,10 @@ namespace RebuildComponentSW
         public override bool OnDisconnect()
         {
             return base.OnDisconnect();
+        }
+        private void Displey(List<FileRef> list)
+        {
+           
         }
     }
 }

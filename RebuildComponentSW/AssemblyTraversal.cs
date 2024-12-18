@@ -14,7 +14,7 @@ namespace RebuildComponentSW
 {
    public  class AssemblyTraversal
     {
-        List<FileRef> list;
+        
         ModelDoc2 swModel;
        
         public AssemblyTraversal(ModelDoc2 m)
@@ -22,7 +22,7 @@ namespace RebuildComponentSW
             swModel = m;
         }
 
-        public void Main()
+        public void Main(ref List<FileRef> list)
         {
           
             Configuration swConf;
@@ -30,7 +30,6 @@ namespace RebuildComponentSW
             FileRef rootComp;
             string rootName;
             string nameCuby; 
-            list = new List<FileRef>();
             swConf = (Configuration)swModel.GetActiveConfiguration();
             swRootComp = (Component2)swConf.GetRootComponent();
             rootName = swModel.GetPathName();
@@ -38,7 +37,7 @@ namespace RebuildComponentSW
             rootComp = new FileRef(nameCuby, rootName);
             rootComp.Description = ".SLDASM";
             TraverseComponent(swRootComp, 1, ref rootComp);
-            ListFormationToRebuild(rootComp);
+            ListFormationToRebuild(rootComp, ref list);
 
            // swApp.CloseAllDocuments(true);    
            // OpenAndRefresh();
@@ -77,7 +76,7 @@ namespace RebuildComponentSW
                 // Debug.Print(sPadStr + swChildComp.Name2 + " <" + swChildComp.ReferencedConfiguration + ">");
             }
         }
-
+        /*
         public void OpenAndRefresh()
         {
             ModelDoc2 swModelDoc = default(ModelDoc2);
@@ -115,14 +114,13 @@ namespace RebuildComponentSW
                 Debug.Print(errors.ToString());
 
             }
-        }
-
-        void ListFormationToRebuild(FileRef fr)
+        }*/
+        void ListFormationToRebuild(FileRef fr,ref List<FileRef>list)
         {
             if (fr.FileRefs == null) return;
             foreach (FileRef item in fr.FileRefs)
             {
-                if (item.FileRefs.Count > 0) ListFormationToRebuild(item);
+                if (item.FileRefs.Count > 0) ListFormationToRebuild(item, ref list);
                 if (list.Find(a => a.FileName == item.FileName) != null) continue;
                 list.Add(item);
                 // PrintTree(item);
