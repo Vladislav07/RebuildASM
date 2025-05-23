@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RebuildComponentSW</RootNamespace>
     <AssemblyName>RebuildComponentSW</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,8 +21,9 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>1</WarningLevel>
     <RegisterForComInterop>true</RegisterForComInterop>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +32,10 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Win32Resource>
+    </Win32Resource>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CodeStack.SwEx.AddIn, Version=0.8.1.0, Culture=neutral, PublicKeyToken=a46023996d4724e7, processorArchitecture=MSIL">
@@ -98,6 +104,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\command1-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\free-icon-my.png" />
+    <None Include="Resources\_002.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Image1.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Image2.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\_005.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\S5Hb-j7PNb8.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

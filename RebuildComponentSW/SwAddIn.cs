@@ -1,22 +1,16 @@
 ﻿using CodeStack.SwEx.AddIn.Attributes;
 using CodeStack.SwEx.AddIn.Core;
 using CodeStack.SwEx.AddIn.Enums;
-using CodeStack.SwEx.AddIn.Helpers;
-using SolidWorksTools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using CodeStack.SwEx.AddIn.Base;
-using System.Xml.Serialization;
 using CodeStack.SwEx.Common.Attributes;
-using CodeStack.SwEx.AddIn.Delegates;
-using RebuildComponentSW.Properties;
 using CodeStack.SwEx.AddIn;
+using RebuildComponentSW.Properties;
 
 namespace RebuildComponentSW
 {
@@ -28,16 +22,24 @@ namespace RebuildComponentSW
     {
         [Title("CmdBuild")]
         [Description("CmdBuildassemble")]
-        [Icon(typeof(Resources), nameof(Resources.command1_icon))]
-        CmdBuild
+        [Icon(typeof(Resources), nameof(Resources._002))]
+        CmdBuild,
 
-      
+        [Title("CmdRebuild")]
+        [Description("CmdRebuildAssemble")]
+        [Icon(typeof(Resources), nameof(Resources._005))]
+        CmdRebuild
+
+
     }
     public enum TaskPaneCommands_e
     {
         [Title("TaskPaneCnd")]
-        [Icon(typeof(Resources), nameof(Resources.command1_icon))]
-        CmdBuild   
+        [Icon(typeof(Resources), nameof(Resources._005))]
+        CmdBuild,
+        [Title("TaskPaneCnd2")]
+        [Icon(typeof(Resources), nameof(Resources._002))]
+        CmdRebuild
     }
 
     [Guid("15CE97A5-D10D-4169-98F5-091DFEC7A2D9"), ComVisible(true)]
@@ -50,7 +52,7 @@ namespace RebuildComponentSW
         ModelDoc2 model = null;
         public override bool OnConnect()
         {
-             AddCommandGroup<Commands_e>(OnCommandClick, OnCommandEnable);
+             AddCommandGroup<Commands_e>(OnCommandClick);
 
 
             swDocsHandler = CreateDocumentsHandler();
@@ -66,12 +68,17 @@ namespace RebuildComponentSW
             switch (cmd)
             {
                 case TaskPaneCommands_e.CmdBuild:
+
                     App.SendMsgToUser("TaskPane Command1 clicked!");
+                    break;
+                case TaskPaneCommands_e.CmdRebuild:
+
+                    App.SendMsgToUser("TaskPane Command2 clicked!");
                     break;
 
             }
         }
-
+        
         private void OnCommandEnable(Commands_e cmd, ref CommandItemEnableState_e state)
         {
             if (cmd == Commands_e.CmdBuild)
@@ -85,7 +92,7 @@ namespace RebuildComponentSW
                 }
             }
         }
-
+        
         private void OnCommandClick(Commands_e cmd)
         {
             switch (cmd)
@@ -97,8 +104,12 @@ namespace RebuildComponentSW
                     tree = new AssemblyTraversal(model);
                     tree.Main(ref list);
                     break;
+                case Commands_e.CmdRebuild:
+                    App.SendMsgToUser("Rebuild clicked!");
+               
+                    break;
 
-    
+
             }
         }
 

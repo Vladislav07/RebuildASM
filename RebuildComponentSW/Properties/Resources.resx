@@ -121,6 +121,12 @@
   <data name="command1_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\command1-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="_002" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\_002.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="_005" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\_005.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="_01" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\01.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
