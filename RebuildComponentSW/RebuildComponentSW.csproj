@@ -71,8 +71,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyTraversal.cs" />
-    <Compile Include="FileRef.cs" />
     <Compile Include="PanelTree.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -85,7 +83,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SW.cs" />
+    <Compile Include="SWDocHandler.cs" />
     <Compile Include="SwAddIn.cs" />
+    <Compile Include="SwDocumentsHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="PanelTree.resx">

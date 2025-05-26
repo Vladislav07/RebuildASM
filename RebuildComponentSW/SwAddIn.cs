@@ -46,21 +46,29 @@ namespace RebuildComponentSW
     [AutoRegister("AddInSwRebuild", "AddInSWRebuldDoc", true)]
     public class SwAddIn:SwAddInEx
     {
-        private IDocumentsHandler<DocumentHandler> swDocsHandler;
-        public List<FileRef> list=null;
-        private AssemblyTraversal tree = null;
-        ModelDoc2 model = null;
+        private SwDocumentsHandler swDocs;
+
+        PanelTree ctrl;
         public override bool OnConnect()
         {
-             AddCommandGroup<Commands_e>(OnCommandClick);
+          /*   AddCommandGroup<Commands_e>(OnCommandClick);
 
-
-            swDocsHandler = CreateDocumentsHandler();
-            swDocsHandler.HandlerCreated += OnHandlerCreated;
-            PanelTree ctrl;
+            swDocs =(SwDocumentsHandler)CreateDocumentsHandler<SWDocHandler>();
+            swDocs.HandlerCreated += SwDocs_HandlerCreated;*/
+     
             var taskPaneView = CreateTaskPane<PanelTree, TaskPaneCommands_e>(OnTaskPaneCommandClick, out ctrl);
 
             return true;
+        }
+
+        private void SwDocs_HandlerCreated(SWDocHandler obj)
+        {
+            obj.Activated += Obj_Activated;
+        }
+
+        private void Obj_Activated(DocumentHandler docHandler)
+        {
+            throw new NotImplementedException();
         }
 
         private void OnTaskPaneCommandClick(TaskPaneCommands_e cmd)
@@ -69,7 +77,7 @@ namespace RebuildComponentSW
             {
                 case TaskPaneCommands_e.CmdBuild:
 
-                    App.SendMsgToUser("TaskPane Command1 clicked!");
+                    
                     break;
                 case TaskPaneCommands_e.CmdRebuild:
 
@@ -99,10 +107,7 @@ namespace RebuildComponentSW
             {
                 case Commands_e.CmdBuild:
                     App.SendMsgToUser("Command1 clicked!");
-                    list = new List<FileRef>();
-                    if (model == null) return;
-                    tree = new AssemblyTraversal(model);
-                    tree.Main(ref list);
+            
                     break;
                 case Commands_e.CmdRebuild:
                     App.SendMsgToUser("Rebuild clicked!");
@@ -113,17 +118,14 @@ namespace RebuildComponentSW
             }
         }
 
-        private void OnHandlerCreated(DocumentHandler handler)
-        {
-            handler.Activated += OnActivated;
-        }
+
 
         private void OnActivated(DocumentHandler docHandler)
         {
 
-            App.SendMsgToUser2($"'{docHandler.Model.GetTitle()}' activated",
-                (int)swMessageBoxIcon_e.swMbInformation, (int)swMessageBoxBtn_e.swMbOk);
-            model = (ModelDoc2)docHandler.Model;
+/*            App.SendMsgToUser2($"'{docHandler.Model.GetTitle()}' activated",
+                (int)swMessageBoxIcon_e.swMbInformation, (int)swMessageBoxBtn_e.swMbOk);*/
+          
         }
 
         private void OnDestroyed(DocumentHandler handler)
@@ -135,9 +137,6 @@ namespace RebuildComponentSW
         {
             return base.OnDisconnect();
         }
-        private void Displey(List<FileRef> list)
-        {
-           
-        }
+       
     }
 }

@@ -16,14 +16,6 @@ namespace RebuildComponentSW
         {
             InitializeComponent();
         }
-        public void  Displey(List<FileRef> list)
-        {
-            foreach (FileRef item in list)
-            {
-                ListViewItem lvi = new ListViewItem();
-                lvi.Text = item.FileName;
-                listView1.Items.Add(lvi);
-            }
-        }
+ 
     }
 }
