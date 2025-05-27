@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
 namespace RebuildComponentSW
 {
-    internal class SW
+     class SW
     {
+        string TemplateName = "C:\\CUBY_PDM\\library\\templates\\Спецификация.sldbomtbt";
         private ModelDoc2 swMainModel;
         private AssemblyDoc swMainAssy;
+        private Configuration swMainConfig;
         public SW(ModelDoc2 swDoc)
         {
             swMainModel = swDoc;
@@ -32,13 +31,13 @@ namespace RebuildComponentSW
 
             string rootPath = swMainModel.GetPathName();
             string nameRoot = Path.GetFileNameWithoutExtension(rootPath);
-
+            swMainConfig = (Configuration)swMainModel.GetActiveConfiguration();
 
             Tree.AddNode("0", nameRoot, rootPath);
         }
         private void GetBomTable()
         {
-            ModelDocExtension Ext;
+            IModelDocExtension Ext;
             BomFeature swBOMFeature;
             BomTableAnnotation swBOMAnnotation;
             string Configuration;
@@ -50,7 +49,7 @@ namespace RebuildComponentSW
 
 
             nNumRow = swTableAnn.RowCount;
-            NotifyBeginOperation(nNumRow, "Reading TableBOM");
+          //  NotifyBeginOperation(nNumRow, "Reading TableBOM");
             for (J = 0; J <= nNumRow - 1; J++)
             {
                 ExtractItem(swBOMAnnotation, Configuration, J);
@@ -62,7 +61,13 @@ namespace RebuildComponentSW
 
         }
 
-
+        public bool ReadTree()
+        {
+            ResolvedLigthWeiht(swMainAssy);
+            GetRootComponent();
+            GetBomTable();
+            return true;
+        }
 
         private void ExtractItem(BomTableAnnotation swBOMAnnotation, string Configuration, int J)
         {
@@ -96,11 +101,11 @@ namespace RebuildComponentSW
             {
 
                 Tree.AddNode(AddextendedNumber, PartNumberTrim, PathName);
-                NotifyStepOperation(PathName);
+               // NotifyStepOperation(PathName);
             }
         }
 
-        private bool TableBomClose(ModelDocExtension Ext, string BomName)
+        private bool TableBomClose(IModelDocExtension Ext, string BomName)
         {
             bool boolstatus;
             string numberTable = BomName.Substring(17);
@@ -110,9 +115,9 @@ namespace RebuildComponentSW
             return boolstatus;
         }
 
-        private void ExtractomTable(out ModelDocExtension Ext, out BomFeature swBOMFeature, out BomTableAnnotation swBOMAnnotation, out string Configuration, out TableAnnotation swTableAnn)
+        private void ExtractomTable(out IModelDocExtension Ext, out BomFeature swBOMFeature, out BomTableAnnotation swBOMAnnotation, out string Configuration, out TableAnnotation swTableAnn)
         {
-            Ext = default(ModelDocExtension);
+           Ext = default(IModelDocExtension);
             Ext = swMainModel.Extension;
 
             swBOMFeature = default(BomFeature);
@@ -125,7 +130,7 @@ namespace RebuildComponentSW
                 swBOMAnnotation = Ext.InsertBomTable3(TemplateName, 0, 0, BomType, Configuration, true, nbrType, false);
                 swBOMFeature = swBOMAnnotation.BomFeature;
                 swTableAnn = (TableAnnotation)swBOMAnnotation;
-                NotifyBeginOperation(0, "Extraction TableBOM");
+               // NotifyBeginOperation(0, "Extraction TableBOM");
             }
             catch (Exception)
             {

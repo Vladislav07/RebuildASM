@@ -47,17 +47,17 @@ namespace RebuildComponentSW
     public class SwAddIn:SwAddInEx
     {
         private SwDocumentsHandler swDocs;
-
+        private SW sw;
         PanelTree ctrl;
         public override bool OnConnect()
         {
-          /*   AddCommandGroup<Commands_e>(OnCommandClick);
+            AddCommandGroup<Commands_e>(OnCommandClick);
 
-            swDocs =(SwDocumentsHandler)CreateDocumentsHandler<SWDocHandler>();
-            swDocs.HandlerCreated += SwDocs_HandlerCreated;*/
-     
+            /* swDocs =(SwDocumentsHandler)CreateDocumentsHandler<SWDocHandler>();
+             swDocs.HandlerCreated += SwDocs_HandlerCreated;*/
+           
             var taskPaneView = CreateTaskPane<PanelTree, TaskPaneCommands_e>(OnTaskPaneCommandClick, out ctrl);
-
+            taskPaneView.ShowView();
             return true;
         }
 
@@ -76,8 +76,16 @@ namespace RebuildComponentSW
             switch (cmd)
             {
                 case TaskPaneCommands_e.CmdBuild:
+                    sw = new SW(App.IActiveDoc2);
+                    sw.ReadTree();
+                    Tree.SearchParentFromChild();
+                    Tree.FillCollection();
+                    Tree.ReverseTree();
+                    Tree.GetInfoPDM();
+                    Tree.CompareVersions();
+                    ctrl.userView = Tree.JoinCompAndDraw();
+                    ctrl.LoadData();
 
-                    
                     break;
                 case TaskPaneCommands_e.CmdRebuild:
 
