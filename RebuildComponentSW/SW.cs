@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
@@ -7,7 +8,7 @@ using SolidWorks.Interop.swconst;
 
 namespace RebuildComponentSW
 {
-     class SW
+    public  class SW
     {
         string TemplateName = "C:\\CUBY_PDM\\library\\templates\\Спецификация.sldbomtbt";
         private ModelDoc2 swMainModel;
@@ -139,5 +140,7 @@ namespace RebuildComponentSW
             }
 
         }
+
+     
     }
 }

@@ -11,6 +11,7 @@ using CodeStack.SwEx.AddIn.Base;
 using CodeStack.SwEx.Common.Attributes;
 using CodeStack.SwEx.AddIn;
 using RebuildComponentSW.Properties;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace RebuildComponentSW
 {
@@ -22,11 +23,13 @@ namespace RebuildComponentSW
     {
         [Title("CmdBuild")]
         [Description("CmdBuildassemble")]
+        [CommandItemInfo(true, true, swWorkspaceTypes_e.Assembly, true)]
         [Icon(typeof(Resources), nameof(Resources._002))]
         CmdBuild,
 
         [Title("CmdRebuild")]
         [Description("CmdRebuildAssemble")]
+        [CommandItemInfo(true, true, swWorkspaceTypes_e.Assembly, true)]
         [Icon(typeof(Resources), nameof(Resources._005))]
         CmdRebuild
 
@@ -34,10 +37,10 @@ namespace RebuildComponentSW
     }
     public enum TaskPaneCommands_e
     {
-        [Title("TaskPaneCnd")]
+        [Title("Build")]
         [Icon(typeof(Resources), nameof(Resources._005))]
         CmdBuild,
-        [Title("TaskPaneCnd2")]
+        [Title("Rebuild")]
         [Icon(typeof(Resources), nameof(Resources._002))]
         CmdRebuild
     }
@@ -51,24 +54,34 @@ namespace RebuildComponentSW
         PanelTree ctrl;
         public override bool OnConnect()
         {
-            AddCommandGroup<Commands_e>(OnCommandClick);
+            AddCommandGroup<Commands_e>(OnCommandClick, OnCommandEnable);
 
-            /* swDocs =(SwDocumentsHandler)CreateDocumentsHandler<SWDocHandler>();
-             swDocs.HandlerCreated += SwDocs_HandlerCreated;*/
-           
+            swDocs =(SwDocumentsHandler)CreateDocumentsHandler<SWDocHandler>();
+            swDocs.HandlerCreated += SwDocs_HandlerCreated;          
             var taskPaneView = CreateTaskPane<PanelTree, TaskPaneCommands_e>(OnTaskPaneCommandClick, out ctrl);
             taskPaneView.ShowView();
             return true;
         }
 
+
         private void SwDocs_HandlerCreated(SWDocHandler obj)
         {
-            obj.Activated += Obj_Activated;
+            obj.Activated += Obj_Activated;            
         }
 
-        private void Obj_Activated(DocumentHandler docHandler)
+        private  void Obj_Activated(DocumentHandler docHandler)
         {
-            throw new NotImplementedException();
+            int lErrors = 0;
+            int lWarnings = 0;
+            ModelDoc2 swModelDoc = (ModelDoc2)docHandler.Model;
+            IModelDocExtension extMod;
+            extMod = swModelDoc.Extension;
+            // extMod.Rebuild((int)swRebuildOptions_e.swRebuildAll);
+            extMod.ForceRebuildAll();
+            swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
+            swModelDoc.Close();
+            docHandler.Dispose();
+
         }
 
         private void OnTaskPaneCommandClick(TaskPaneCommands_e cmd)
@@ -85,9 +98,9 @@ namespace RebuildComponentSW
                     Tree.CompareVersions();
                     ctrl.userView = Tree.JoinCompAndDraw();
                     ctrl.LoadData();
-
                     break;
                 case TaskPaneCommands_e.CmdRebuild:
+                    ActionControler actionContr = new ActionControler(App);
 
                     App.SendMsgToUser("TaskPane Command2 clicked!");
                     break;
