@@ -58,6 +58,7 @@ namespace RebuildComponentSW
 
 
             PDM.CockSelList(CountItemToCheckOut);
+            listPart.ForEach(d => d.AddItemToSelList());
             listPartDraw.ForEach(d => d.AddItemToSelList());
             listAss.ForEach(d => d.AddItemToSelList());
             listAssDraw.ForEach(d => d.AddItemToSelList());
@@ -91,7 +92,7 @@ namespace RebuildComponentSW
             listFiles.ForEach(file => OpenFile(file));
         }
 
-        public void OpenFile(string item)
+        private void OpenFile(string item)
         {
             ModelDoc2 swModelDoc = default(ModelDoc2);
             int errors = 0;
@@ -132,6 +133,7 @@ namespace RebuildComponentSW
                     MsgInfo msgInfo = new MsgInfo();
                     //msgInfo.errorMsg=errors.n
                     msgInfo.numberCuby = fileName;
+                    RefreshFile(swModelDoc);
                     return;
                 }
   
@@ -142,6 +144,19 @@ namespace RebuildComponentSW
                 MessageBox.Show(error.ToString());
 
             }
+        }
+
+        private void RefreshFile(ModelDoc2 swModelDoc)
+        {
+            int lErrors = 0;
+            int lWarnings = 0;
+            IModelDocExtension extMod;
+            extMod = swModelDoc.Extension;
+            // extMod.Rebuild((int)swRebuildOptions_e.swRebuildAll);
+            extMod.ForceRebuildAll();
+            swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
+            swModelDoc.Close();
+ 
         }
 
     }

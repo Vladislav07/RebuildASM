@@ -101,7 +101,6 @@ namespace RebuildComponentSW
         private void GenerateDataGridView()
         {
             dataGridView = new DataGridView();
-           // this.Width = 1000;
 
             dataGridView.Location = new Point(0, 50);
             dataGridView.BackgroundColor = Color.White;
@@ -120,7 +119,7 @@ namespace RebuildComponentSW
                 int headerHeight1 = dataGridView.ColumnHeadersHeight;
                 int rowsHeight1 = dataGridView.Rows.GetRowsHeight(DataGridViewElementStates.Visible);
                 int totalHeight1 = rowsHeight1 + headerHeight1;
-                int maxAllowedHeight1 = 500;
+                int maxAllowedHeight1 = 800;
                 int desiredHeight1 = Math.Min(totalHeight1, maxAllowedHeight1);
                 int minHeight1 = rowHeight1 + headerHeight1;
 
@@ -144,7 +143,21 @@ namespace RebuildComponentSW
 
             dataGridView.DataSource = dt;
 
-           // SetPropertiesGrig();
+            SetPropertiesGrig();
+        }
+        private void SetPropertiesGrig()
+        {
+            dataGridView.Columns[0].Width = 150;
+            dataGridView.Columns[1].Width = 50;
+            dataGridView.Columns[2].Width = 40;
+            dataGridView.Columns[3].Width = 100;
+            dataGridView.Columns[4].Width = 40;
+            dataGridView.Columns[5].Width = 70;
+            dataGridView.Columns[6].Width = 50;
+            dataGridView.Columns[7].Width = 100;
+            dataGridView.Columns[8].Width = 70;
+            dataGridView.Columns[9].Width = 70;
+            dataGridView.Columns[10].Width = 70;
         }
     }
 }

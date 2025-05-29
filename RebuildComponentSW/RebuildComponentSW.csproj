@@ -80,6 +80,7 @@
     <Compile Include="Drawing.cs" />
     <Compile Include="EDMCallback.cs" />
     <Compile Include="EdmCallbackGet.cs" />
+    <Compile Include="GetControler.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="ModelCondition.cs" />
     <Compile Include="PanelTree.cs">

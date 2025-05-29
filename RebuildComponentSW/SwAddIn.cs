@@ -49,39 +49,15 @@ namespace RebuildComponentSW
     [AutoRegister("AddInSwRebuild", "AddInSWRebuldDoc", true)]
     public class SwAddIn:SwAddInEx
     {
-        private SwDocumentsHandler swDocs;
-        private SW sw;
+        
         PanelTree ctrl;
         public override bool OnConnect()
         {
             AddCommandGroup<Commands_e>(OnCommandClick, OnCommandEnable);
-
-            swDocs =(SwDocumentsHandler)CreateDocumentsHandler<SWDocHandler>();
-            swDocs.HandlerCreated += SwDocs_HandlerCreated;          
+       
             var taskPaneView = CreateTaskPane<PanelTree, TaskPaneCommands_e>(OnTaskPaneCommandClick, out ctrl);
             taskPaneView.ShowView();
             return true;
-        }
-
-
-        private void SwDocs_HandlerCreated(SWDocHandler obj)
-        {
-            obj.Activated += Obj_Activated;            
-        }
-
-        private  void Obj_Activated(DocumentHandler docHandler)
-        {
-            int lErrors = 0;
-            int lWarnings = 0;
-            ModelDoc2 swModelDoc = (ModelDoc2)docHandler.Model;
-            IModelDocExtension extMod;
-            extMod = swModelDoc.Extension;
-            // extMod.Rebuild((int)swRebuildOptions_e.swRebuildAll);
-            extMod.ForceRebuildAll();
-            swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
-            swModelDoc.Close();
-            docHandler.Dispose();
-
         }
 
         private void OnTaskPaneCommandClick(TaskPaneCommands_e cmd)
@@ -89,20 +65,12 @@ namespace RebuildComponentSW
             switch (cmd)
             {
                 case TaskPaneCommands_e.CmdBuild:
-                    sw = new SW(App.IActiveDoc2);
-                    sw.ReadTree();
-                    Tree.SearchParentFromChild();
-                    Tree.FillCollection();
-                    Tree.ReverseTree();
-                    Tree.GetInfoPDM();
-                    Tree.CompareVersions();
-                    ctrl.userView = Tree.JoinCompAndDraw();
-                    ctrl.LoadData();
+                    GetControler getCtrl=new GetControler(ctrl, App.IActiveDoc2);
+                    getCtrl.GetData();
                     break;
                 case TaskPaneCommands_e.CmdRebuild:
                     ActionControler actionContr = new ActionControler(App);
-
-                    App.SendMsgToUser("TaskPane Command2 clicked!");
+            
                     break;
 
             }
@@ -112,13 +80,13 @@ namespace RebuildComponentSW
         {
             if (cmd == Commands_e.CmdBuild)
             {
-                if (state == CommandItemEnableState_e.DeselectEnable)
+              /*  if (state == CommandItemEnableState_e.DeselectEnable)
                 {
                     if (App.IActiveDoc2?.ISelectionManager?.GetSelectedObjectCount2(-1) == 0)
                     {
                         state = CommandItemEnableState_e.DeselectDisable;
                     }
-                }
+                }*/
             }
         }
         
@@ -127,8 +95,9 @@ namespace RebuildComponentSW
             switch (cmd)
             {
                 case Commands_e.CmdBuild:
-                    App.SendMsgToUser("Command1 clicked!");
-            
+                    GetControler getCtrl = new GetControler(ctrl, App.IActiveDoc2);
+                    getCtrl.GetData();
+
                     break;
                 case Commands_e.CmdRebuild:
                     App.SendMsgToUser("Rebuild clicked!");
@@ -140,19 +109,6 @@ namespace RebuildComponentSW
         }
 
 
-
-        private void OnActivated(DocumentHandler docHandler)
-        {
-
-/*            App.SendMsgToUser2($"'{docHandler.Model.GetTitle()}' activated",
-                (int)swMessageBoxIcon_e.swMbInformation, (int)swMessageBoxBtn_e.swMbOk);*/
-          
-        }
-
-        private void OnDestroyed(DocumentHandler handler)
-        {
-            handler.Activated -= OnActivated;
-        }
 
         public override bool OnDisconnect()
         {
