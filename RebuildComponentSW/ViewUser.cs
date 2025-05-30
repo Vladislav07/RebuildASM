@@ -23,4 +23,15 @@ namespace RebuildComponentSW
         internal string DrawNeedRebuild { get; set; }
         internal string DrawIsLocked { get; set; }
     }
+    public struct InfoView
+    {
+        internal string NameComp { get; set; }
+        internal string TypeComp { get; set; }
+        internal string Ext { get; set; }
+        internal string Level { get; set; }
+        internal string State { get; set; }
+        internal string StPDM { get; set; }
+        internal string IsLocked { get; set; }
+   
+    }
 }

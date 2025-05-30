@@ -20,8 +20,7 @@ namespace RebuildComponentSW
         public static List<Drawing> listDraw;
 
         static Dictionary<string, string> structuralNumbers;
-        internal static event Action<MsgInfo> msgDataOperation;
-        internal static event Action<MsgInfo> msgNameOperation;
+        internal static event Action<int,MsgInfo> NotifyTree;
         static Tree()
         {
 
@@ -149,22 +148,7 @@ namespace RebuildComponentSW
             int i = 1;
             List<Model> models = listComp.Cast<Model>().Concat(listDraw).ToList();
             InfoAboutProcessing("Refresh from storage PDM", models.Count);
-            /*       InfoAboutProcessing("Refresh from storage PDM", listComp.Count+listDraw.Count);
-                   foreach (Part item in listComp)
-                   {
-                       InfoDataProcessing(item.CubyNumber, i);
-                       PDM.RefreshFile(item);
-                       item.condition = null;
-
-                       i++;
-                   }
-                   foreach (Drawing item in listDraw)
-                   {
-                       InfoDataProcessing(item.CubyNumber, i);
-                       PDM.RefreshFile(item);
-                       item.condition = null;
-                       i++;
-                   }*/
+   
             foreach (Model comp in models)
             {
                 InfoDataProcessing(comp.CubyNumber, i);
@@ -198,7 +182,7 @@ namespace RebuildComponentSW
             MsgInfo mno = new MsgInfo();
             mno.typeOperation = nameOper;
             mno.countStep = countCycl;
-           // msgNameOperation.Invoke(mno);
+            NotifyTree.Invoke(2,mno);
         }
         private static void InfoDataProcessing(string nameCuby, int i)
         {
@@ -206,7 +190,7 @@ namespace RebuildComponentSW
             MsgInfo mdata = new MsgInfo();
             mdata.numberCuby = nameCuby;
             mdata.currentStep = i;
-         //   msgDataOperation.Invoke(mdata);
+            NotifyTree.Invoke(3,mdata);
         }
         public static List<ViewUser> JoinCompAndDraw()
         {

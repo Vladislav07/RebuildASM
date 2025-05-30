@@ -53,7 +53,7 @@ namespace RebuildComponentSW
         PanelTree ctrl;
         public override bool OnConnect()
         {
-            AddCommandGroup<Commands_e>(OnCommandClick, OnCommandEnable);
+           // AddCommandGroup<Commands_e>(OnCommandClick, OnCommandEnable);
        
             var taskPaneView = CreateTaskPane<PanelTree, TaskPaneCommands_e>(OnTaskPaneCommandClick, out ctrl);
             taskPaneView.ShowView();

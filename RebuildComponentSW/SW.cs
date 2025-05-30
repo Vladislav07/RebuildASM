@@ -10,6 +10,8 @@ namespace RebuildComponentSW
 {
     public  class SW
     {
+        public event Action<int, MsgInfo> NotifySW;
+
         string TemplateName = "C:\\CUBY_PDM\\library\\templates\\Спецификация.sldbomtbt";
         private ModelDoc2 swMainModel;
         private AssemblyDoc swMainAssy;
@@ -22,6 +24,7 @@ namespace RebuildComponentSW
         private void ResolvedLigthWeiht(AssemblyDoc ass)
         {
             int countLigthWeiht = ass.GetLightWeightComponentCount();
+            NotifyBeginOperation(countLigthWeiht, "Resolved assemble to LigthWeiht");
             if (countLigthWeiht > 0)
             {
                 ass.ResolveAllLightweight();
@@ -33,7 +36,7 @@ namespace RebuildComponentSW
             string rootPath = swMainModel.GetPathName();
             string nameRoot = Path.GetFileNameWithoutExtension(rootPath);
             swMainConfig = (Configuration)swMainModel.GetActiveConfiguration();
-
+            
             Tree.AddNode("0", nameRoot, rootPath);
         }
         private void GetBomTable()
@@ -50,7 +53,7 @@ namespace RebuildComponentSW
 
 
             nNumRow = swTableAnn.RowCount;
-          //  NotifyBeginOperation(nNumRow, "Reading TableBOM");
+            NotifyBeginOperation(nNumRow, "Reading TableBOM");
             for (J = 0; J <= nNumRow - 1; J++)
             {
                 ExtractItem(swBOMAnnotation, Configuration, J);
@@ -102,7 +105,7 @@ namespace RebuildComponentSW
             {
 
                 Tree.AddNode(AddextendedNumber, PartNumberTrim, PathName);
-               // NotifyStepOperation(PathName);
+                NotifyStepOperation(PathName);
             }
         }
 
@@ -118,7 +121,8 @@ namespace RebuildComponentSW
 
         private void ExtractomTable(out IModelDocExtension Ext, out BomFeature swBOMFeature, out BomTableAnnotation swBOMAnnotation, out string Configuration, out TableAnnotation swTableAnn)
         {
-           Ext = default(IModelDocExtension);
+            NotifyBeginOperation(0, "Obtaining specifications");
+            Ext = default(IModelDocExtension);
             Ext = swMainModel.Extension;
 
             swBOMFeature = default(BomFeature);
@@ -141,6 +145,25 @@ namespace RebuildComponentSW
 
         }
 
-     
+        private void NotifyBeginOperation(int count, string nameOper)
+        {
+            y = 1;
+            MsgInfo msgInfo = new MsgInfo();
+            msgInfo.typeOperation = nameOper;
+            msgInfo.countStep = count;
+            NotifySW?.Invoke(2, msgInfo);
+
+        }
+        int y;
+        private void NotifyStepOperation(string file)
+        {
+           
+            MsgInfo msgInfo = new MsgInfo();
+            string numberCuby = Path.GetFileName(file);
+            msgInfo.numberCuby = numberCuby;
+            msgInfo.countStep = y;
+            NotifySW?.Invoke(3, msgInfo);
+            y++;
+        }
     }
 }
