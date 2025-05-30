@@ -21,6 +21,12 @@ namespace RebuildComponentSW
     [CommandGroupInfo(0)]
     public enum Commands_e
     {
+        [Title("CmdUpdateModel")]
+        [Description("CmdUpdateModelActive")]
+        [CommandItemInfo(true, true, swWorkspaceTypes_e.Assembly, true)]
+        [Icon(typeof(Resources), nameof(Resources._01))]
+        CmdUpdate,
+
         [Title("CmdBuild")]
         [Description("CmdBuildassemble")]
         [CommandItemInfo(true, true, swWorkspaceTypes_e.Assembly, true)]
@@ -37,6 +43,9 @@ namespace RebuildComponentSW
     }
     public enum TaskPaneCommands_e
     {
+        [Title("Update")]
+        [Icon(typeof(Resources), nameof(Resources._01))]
+        CmdUpdate,
         [Title("Build")]
         [Icon(typeof(Resources), nameof(Resources._005))]
         CmdBuild,
@@ -64,6 +73,9 @@ namespace RebuildComponentSW
         {
             switch (cmd)
             {
+                case TaskPaneCommands_e.CmdUpdate:
+                    
+                    break;
                 case TaskPaneCommands_e.CmdBuild:
                     GetControler getCtrl=new GetControler(ctrl, App.IActiveDoc2);
                     getCtrl.GetData();

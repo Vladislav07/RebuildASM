@@ -317,25 +317,25 @@ namespace RebuildComponentSW
         {
             lbMsg = new Label();
             lbMsg.Text = "...";
-            lbMsg.Location = new Point(25, 75);
+            lbMsg.Location = new Point(25, 25);
             lbMsg.Width = 300;
             this.Controls.Add(lbMsg);
 
             progressBar1 = new System.Windows.Forms.ProgressBar();
-            progressBar1.Location = new Point(75, 100);
+            progressBar1.Location = new Point(50, 100);
             progressBar1.Width = 250;
             progressBar1.Height = 15;
             this.Controls.Add(progressBar1);
 
             lbStart = new Label();
             lbStart.Text = "0";
-            lbStart.Location = new Point(50, 100);
+            lbStart.Location = new Point(25, 100);
             this.Controls.Add(lbStart);
 
             lbCount = new Label();
 
             lbCount.Text = "0";
-            lbCount.Location = new Point(370, 100);
+            lbCount.Location = new Point(350, 100);
             this.Controls.Add(lbCount);
 
             lbNumber = new Label();
@@ -364,11 +364,11 @@ namespace RebuildComponentSW
                      break;
 
                  case 1:      //LoadActiveModel
-                    // this.Text = msg.numberCuby;
+                     this.Text = msg.numberCuby;
 
                      break;
                  case 2:      //BeginOperation
-                     lbMsg.ForeColor = Color.Red;
+                     lbMsg.ForeColor = Color.Green;
                     this.lbMsg.Text = msg.typeOperation;
                      this.progressBar1.Maximum = msg.countStep;
                      this.progressBar1.Minimum = 0;
