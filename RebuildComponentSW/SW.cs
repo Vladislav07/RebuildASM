@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
@@ -20,6 +21,7 @@ namespace RebuildComponentSW
         {
             swMainModel = swDoc;
             swMainAssy = (AssemblyDoc)swMainModel;
+           
         }
         private void ResolvedLigthWeiht(AssemblyDoc ass)
         {
@@ -32,12 +34,20 @@ namespace RebuildComponentSW
         }
         private void GetRootComponent()
         {
-
-            string rootPath = swMainModel.GetPathName();
-            string nameRoot = Path.GetFileNameWithoutExtension(rootPath);
-            swMainConfig = (Configuration)swMainModel.GetActiveConfiguration();
+            try
+            {
+             string rootPath = swMainModel.GetPathName();
+             string nameRoot = Path.GetFileNameWithoutExtension(rootPath);
+             swMainConfig = (Configuration)swMainModel.GetActiveConfiguration();
             
-            Tree.AddNode("0", nameRoot, rootPath);
+             Tree.AddNode("0", nameRoot, rootPath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+               
+            }
+            
         }
         private void GetBomTable()
         {
