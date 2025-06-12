@@ -15,8 +15,12 @@ namespace RebuildComponentSW
         ModelDoc2 model;
         public GetControler(PanelTree panelTree, ModelDoc2 _model)
         {
+
             ctrl = panelTree;
+            ctrl.DataAcquisitionProcess();
+           
             model = _model;
+           
             sw = new SW(model);
             sw.NotifySW += Sw_NotifySW;
             PDM.NotifyPDM += PDM_NotifyPDM;
@@ -40,12 +44,24 @@ namespace RebuildComponentSW
 
         public bool GetData()
         {
-            ctrl.DataAcquisitionProcess();
+            if (model == null)
+            {
+                ctrl.Notifacation(0, new MsgInfo("Could not acquire an active document"));
+                return false;
+            }
             sw.ReadTree();
             Tree.SearchParentFromChild();
             Tree.FillCollection();
             Tree.ReverseTree();
             Tree.GetInfoPDM();
+            Tree.CompareVersions();
+            ctrl.userView = GetInfo();
+            ctrl.LoadData();
+            return true;
+        }
+        public bool GetUpdatedData()
+        {
+            Tree.RefreshFileFromPDM();
             Tree.CompareVersions();
             ctrl.userView = GetInfo();
             ctrl.LoadData();

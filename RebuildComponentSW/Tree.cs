@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Data;
 using System.Windows.Forms;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace RebuildComponentSW
 
@@ -31,9 +32,17 @@ namespace RebuildComponentSW
         }
         public static void AddNode(string NodeNumber, string cubyNumber, string pathNode)
         {
-
-            ModelTree.Add(NodeNumber, GetModelFromNumber(cubyNumber, pathNode));
-            structuralNumbers.Add(NodeNumber, cubyNumber);
+            try
+            {
+                ModelTree.Add(NodeNumber, GetModelFromNumber(cubyNumber, pathNode));
+                structuralNumbers.Add(NodeNumber, cubyNumber);
+            }
+            catch (Exception e)
+            {
+                e.Data.Add(pathNode,cubyNumber);
+                throw e;
+            }
+        
         }
 
         private static Part GetModelFromNumber(string numberCuby, string path)
@@ -154,7 +163,6 @@ namespace RebuildComponentSW
                 InfoDataProcessing(comp.CubyNumber, i);
                 PDM.RefreshFile(comp);
                 comp.condition = null;
-
                 i++;
             }
 
@@ -226,6 +234,15 @@ namespace RebuildComponentSW
 
 
             return lv;
+        }
+        public static void ClearCollection()
+        {
+            listComp.Clear();
+            
+            listDraw.Clear();
+            ModelTree.Clear();
+            structuralNumbers.Clear();
+            
         }
 
     }

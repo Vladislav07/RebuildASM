@@ -13,8 +13,8 @@ namespace RebuildComponentSW
 {
     public class ActionControler
     {
-        ISldWorks swApp;
-        public ActionControler(ISldWorks app)            
+        SldWorks swApp;
+        public ActionControler(SldWorks app)            
         {
             swApp = app;
             PDM.NotifyPDM += PDM_NotifyPDM;
@@ -23,6 +23,7 @@ namespace RebuildComponentSW
 
         public void RebuildTree()
         {
+             bool isClose = swApp.CloseAllDocuments(true);
              RebuildTreeLoopLevel();         
         }
 
@@ -63,7 +64,12 @@ namespace RebuildComponentSW
             listAss.ForEach(d => d.AddItemToSelList());
             listAssDraw.ForEach(d => d.AddItemToSelList());
             PDM.BatchGet();
+            if (listPart.Count > 0)
+            {
 
+                List<string> list = listPart.Select(d => d.FullPath).ToList();
+                loopFilesToRebuild(list);
+            }
             if (listPartDraw.Count > 0)
             {
 
@@ -133,9 +139,11 @@ namespace RebuildComponentSW
                     MsgInfo msgInfo = new MsgInfo();
                     //msgInfo.errorMsg=errors.n
                     msgInfo.numberCuby = fileName;
-                    RefreshFile(swModelDoc);
                     return;
                 }
+                  
+                    RefreshFile(swModelDoc);
+                    swApp.CloseDoc(fileName);
   
 
             }
@@ -155,7 +163,7 @@ namespace RebuildComponentSW
             // extMod.Rebuild((int)swRebuildOptions_e.swRebuildAll);
             extMod.ForceRebuildAll();
             swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
-            swModelDoc.Close();
+            
  
         }
 

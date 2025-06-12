@@ -358,7 +358,7 @@ namespace RebuildComponentSW
              {
                  case 0:       //Error
                  
-                     this.lbNumber.Text = msg.numberCuby;
+                     this.lbMsg.Text = msg.errorMsg;
                      lbMsg.ForeColor = Color.Red;
 
                      break;
@@ -384,7 +384,18 @@ namespace RebuildComponentSW
                  default:
                      break;
             }
+            
         }
+        public void Clear()
+        {
+            dt.Dispose();
+            dataGridView.Dispose();
+            chB_ToRebuild.Dispose();
+            chB_Clean.Dispose();
+            checkBox1.Dispose();
+            chB_Impossible.Dispose(); 
+        }
+    
     }
 }
 

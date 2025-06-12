@@ -13,47 +13,24 @@ using CodeStack.SwEx.AddIn;
 using RebuildComponentSW.Properties;
 using System.Runtime.InteropServices.ComTypes;
 using System.Reflection;
+using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace RebuildComponentSW
 {
     [Title("CmdOpenPanel")]
     [Description("CmdOpen")]
     [Icon(typeof(Resources), nameof(Resources._01))]
-    [CommandGroupInfo(0)]
+    [CommandGroupInfo(1)]
     public enum Commands_e
     {
         [Title("CmdUpdateModel")]
         [Description("CmdUpdateModelActive")]
-        [CommandItemInfo(true, true, swWorkspaceTypes_e.Assembly, true)]
+        [CommandItemInfo(true, false, swWorkspaceTypes_e.Assembly, false)]
         [Icon(typeof(Resources), nameof(Resources._01))]
         CmdConnect,
-
-        [Title("CmdBuild")]
-        [Description("CmdBuildassemble")]
-        [CommandItemInfo(true, true, swWorkspaceTypes_e.Assembly, true)]
-        [Icon(typeof(Resources), nameof(Resources._002))]
-        CmdBuild,
-
-        [Title("CmdRebuild")]
-        [Description("CmdRebuildAssemble")]
-        [CommandItemInfo(true, true, swWorkspaceTypes_e.Assembly, true)]
-        [Icon(typeof(Resources), nameof(Resources._005))]
-        CmdRebuild
-
-
     }
-    public enum TaskPaneCommands_e
-    {
-        [Title("Update")]
-        [Icon(typeof(Resources), nameof(Resources._01))]
-        CmdConnect,
-        [Title("Build")]
-        [Icon(typeof(Resources), nameof(Resources._005))]
-        CmdBuild,
-        [Title("Rebuild")]
-        [Icon(typeof(Resources), nameof(Resources._002))]
-        CmdRebuild
-    }
+  
 
     [Guid("15CE97A5-D10D-4169-98F5-091DFEC7A2D9"), ComVisible(true)]
     [AutoRegister("AddInSwRebuild", "AddInSWRebuldDoc", true)]
@@ -61,76 +38,102 @@ namespace RebuildComponentSW
     {
         
         PanelTree ctrl;
-   
+        TaskpaneView taskPaneView;
+        GetControler getCtrl;
+        SldWorks sld;
         public override bool OnConnect()
-        {
-            AddCommandGroup<Commands_e>(OnCommandClick, OnCommandEnable);
-            var taskPaneView = CreateTaskPane<PanelTree, TaskPaneCommands_e>(OnTaskPaneCommandClick, out ctrl);
-            taskPaneView.ShowView();
+        {         
+             AddCommandGroup<Commands_e>(OnCommandClick, OnCommandEnable);
+             //taskPaneView = (TaskpaneView)CreateTaskPane<PanelTree, TaskPaneCommands_e>(OnTaskPaneCommandClick, out ctrl);
+             taskPaneView = (TaskpaneView)CreateTaskPane<PanelTree>(out ctrl);
+             taskPaneView.AddStandardButton((int)swTaskPaneBitmapsOptions_e.swTaskPaneBitmapsOptions_Ok,
+              "Rebuild");
+             taskPaneView.AddStandardButton((int)swTaskPaneBitmapsOptions_e.swTaskPaneBitmapsOptions_Close, "Close");
+             taskPaneView.SetButtonState(1,false);
+             taskPaneView.SetButtonState(0, true);
+        
             return true;
         }
 
-        private void OnTaskPaneCommandClick(TaskPaneCommands_e cmd)
-        {
-            
-            SldWorks sld=(SldWorks)App;
-            switch (cmd)
-            {
-  
-                case TaskPaneCommands_e.CmdBuild:             
-                    sld.ActiveModelDocChangeNotify += Sld_ActiveModelDocChangeNotify;
-                    GetControler getCtrl;
-                    getCtrl=new GetControler(ctrl, App.IActiveDoc2);
-                    getCtrl.GetData();
-          
-                    break;
-                case TaskPaneCommands_e.CmdRebuild:
-                    sld.ActiveModelDocChangeNotify -= Sld_ActiveModelDocChangeNotify;
-                    ActionControler actionContr = new ActionControler(App);
-            
-                    break;
-
-            }
-        }
 
         private int Sld_ActiveModelDocChangeNotify()
         {
-            App.SendMsgToUser2("Model updated",
-               (int)swMessageBoxIcon_e.swMbInformation, (int)swMessageBoxBtn_e.swMbOk);
+            ctrl.Clear();
+            Tree.ClearCollection();
+            getCtrl=null;
             return 0;
         }
 
 
         private void OnCommandEnable(Commands_e cmd, ref CommandItemEnableState_e state)
         {
-            if (cmd == Commands_e.CmdBuild)
-            {
-                state = CommandItemEnableState_e.DeselectEnable;
-            }
+   
+
         }
         
         private void OnCommandClick(Commands_e cmd)
         {
+            bool isShow = false;
             switch (cmd)
-            {
-                case Commands_e.CmdBuild:
-                    GetControler getCtrl = new GetControler(ctrl, App.IActiveDoc2);
-                    getCtrl.GetData();
-                   
-                    break;
-                case Commands_e.CmdRebuild:
-                    App.SendMsgToUser("Rebuild clicked!");
+            { 
                
-                    break;
+                case Commands_e.CmdConnect:
 
+                    getCtrl = new GetControler(ctrl, App.IActiveDoc2);
+                    if (!isShow)
+                        {
+                            taskPaneView.TaskPaneToolbarButtonClicked += TaskPaneView_TaskPaneToolbarButtonClicked;
+                            taskPaneView.ShowView();
+                            isShow = true;
+                        }
+                    else
+                        {
+                            taskPaneView.TaskPaneToolbarButtonClicked -= TaskPaneView_TaskPaneToolbarButtonClicked;
+                            taskPaneView.HideView();
+                        }
+                    
+                    if (!getCtrl.GetData())
+                        {
+                            getCtrl = null;
+                            return;
+                        }
+                        sld = (SldWorks)App;
+                   
+                        sld.ActiveModelDocChangeNotify += Sld_ActiveModelDocChangeNotify;
+                        isShow = false;
+                    
+                    break;
+        
+                
 
             }
         }
 
+        private int TaskPaneView_TaskPaneToolbarButtonClicked(int ButtonIndex)
+        {
+            switch ((ButtonIndex + 1))
+            {
+                case 1:
+                    sld.ActiveModelDocChangeNotify -= Sld_ActiveModelDocChangeNotify;
+                    ActionControler actionContr = new ActionControler(sld);
+                    ctrl.Clear();
+                    ctrl.DataAcquisitionProcess();
+                    actionContr.RebuildTree();
+                    getCtrl.GetUpdatedData();
+                    break;
+                case 2:
+                    ctrl.Clear();
+                    Tree.ClearCollection();
+                    getCtrl = null;
+                    break;
 
+            }
+            return 1;
+        }
 
         public override bool OnDisconnect()
         {
+            taskPaneView.DeleteView();
             return base.OnDisconnect();
         }
        

@@ -77,6 +77,7 @@ namespace RebuildComponentSW
 
         public bool ReadTree()
         {
+            
             ResolvedLigthWeiht(swMainAssy);
             GetRootComponent();
             GetBomTable();
