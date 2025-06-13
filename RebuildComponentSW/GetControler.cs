@@ -55,41 +55,12 @@ namespace RebuildComponentSW
             Tree.ReverseTree();
             Tree.GetInfoPDM();
             Tree.CompareVersions();
-            ctrl.userView = GetInfo();
+            ctrl.userView = Tree.GetInfo();
             ctrl.LoadData();
             return true;
         }
-        public bool GetUpdatedData()
-        {
-            Tree.RefreshFileFromPDM();
-            Tree.CompareVersions();
-            ctrl.userView = GetInfo();
-            ctrl.LoadData();
-            return true;
-        }
+      
 
-        private List<InfoView> GetInfo()
-        {
-            List<InfoView> infoViews = new List<InfoView>();
-            List<Model> models = new List<Model>();
-            models.AddRange(Tree.listComp);
-            models.AddRange(Tree.listDraw);
-            foreach (Model item in models) {
-                infoViews.Add(new InfoView
-                {
-                    NameComp = item.CubyNumber,
-                    TypeComp = item.Section,
-                    Ext = item.Ext,
-                    Level = item.Level.ToString(),
-                    StPDM = item.File.CurrentState.Name.ToString(),
-                    State = item.condition.stateModel.ToString(),
-                    IsLocked = item.File.IsLocked.ToString(),
-
-                });
-            }
-            return infoViews;
-
-        }
 
     }
 }

@@ -23,7 +23,8 @@ namespace RebuildComponentSW
 
         public void RebuildTree()
         {
-             bool isClose = swApp.CloseAllDocuments(true);
+
+            bool isClose = swApp.CloseAllDocuments(true);
              RebuildTreeLoopLevel();         
         }
 

@@ -18,19 +18,14 @@ using System.Diagnostics;
 
 namespace RebuildComponentSW
 {
-    [Title("CmdOpenPanel")]
-    [Description("CmdOpen")]
-    [Icon(typeof(Resources), nameof(Resources._01))]
-    [CommandGroupInfo(1)]
-    public enum Commands_e
+    public enum StateApp
     {
-        [Title("CmdUpdateModel")]
-        [Description("CmdUpdateModelActive")]
-        [CommandItemInfo(true, false, swWorkspaceTypes_e.Assembly, false)]
-        [Icon(typeof(Resources), nameof(Resources._01))]
-        CmdConnect,
+        None = 0,
+        Read = 1,
+        Rebuild= 2,
+        Refresh= 3,
+
     }
-  
 
     [Guid("15CE97A5-D10D-4169-98F5-091DFEC7A2D9"), ComVisible(true)]
     [AutoRegister("AddInSwRebuild", "AddInSWRebuldDoc", true)]
@@ -39,20 +34,45 @@ namespace RebuildComponentSW
         
         PanelTree ctrl;
         TaskpaneView taskPaneView;
-        GetControler getCtrl;
         SldWorks sld;
+        StateApp st;
         public override bool OnConnect()
         {         
-             AddCommandGroup<Commands_e>(OnCommandClick, OnCommandEnable);
-             //taskPaneView = (TaskpaneView)CreateTaskPane<PanelTree, TaskPaneCommands_e>(OnTaskPaneCommandClick, out ctrl);
              taskPaneView = (TaskpaneView)CreateTaskPane<PanelTree>(out ctrl);
-             taskPaneView.AddStandardButton((int)swTaskPaneBitmapsOptions_e.swTaskPaneBitmapsOptions_Ok,
-              "Rebuild");
+             taskPaneView.AddStandardButton((int)swTaskPaneBitmapsOptions_e.swTaskPaneBitmapsOptions_Back, "Read");
+             taskPaneView.AddStandardButton((int)swTaskPaneBitmapsOptions_e.swTaskPaneBitmapsOptions_Ok,"Rebuild");
+             taskPaneView.AddStandardButton((int)swTaskPaneBitmapsOptions_e.swTaskPaneBitmapsOptions_Next, "Update");
              taskPaneView.AddStandardButton((int)swTaskPaneBitmapsOptions_e.swTaskPaneBitmapsOptions_Close, "Close");
-             taskPaneView.SetButtonState(1,false);
-             taskPaneView.SetButtonState(0, true);
-        
-            return true;
+             st=StateApp.None;
+             SetState();
+             taskPaneView.TaskPaneToolbarButtonClicked += TaskPaneView_TaskPaneToolbarButtonClicked;
+             return true;
+        }
+
+        private void SetState()
+        {
+            switch ((int)st)
+            {
+                case 0:
+                    taskPaneView.SetButtonState(1, false);
+                    taskPaneView.SetButtonState(2, true);
+                    taskPaneView.SetButtonState(3, true);
+                    taskPaneView.SetButtonState(4, true);
+                    break;
+                case 1:
+                    taskPaneView.SetButtonState(1, true);
+                    taskPaneView.SetButtonState(2, false);
+                    taskPaneView.SetButtonState(3, true);
+                    taskPaneView.SetButtonState(4, false);
+                    break;
+                case 2:
+                    taskPaneView.SetButtonState(1, true);
+                    taskPaneView.SetButtonState(2, true);
+                    taskPaneView.SetButtonState(3, false);
+                    taskPaneView.SetButtonState(4, false);
+                    break;
+
+            }
         }
 
 
@@ -60,72 +80,47 @@ namespace RebuildComponentSW
         {
             ctrl.Clear();
             Tree.ClearCollection();
-            getCtrl=null;
             return 0;
         }
 
 
-        private void OnCommandEnable(Commands_e cmd, ref CommandItemEnableState_e state)
-        {
-   
-
-        }
-        
-        private void OnCommandClick(Commands_e cmd)
-        {
-            bool isShow = false;
-            switch (cmd)
-            { 
-               
-                case Commands_e.CmdConnect:
-
-                    getCtrl = new GetControler(ctrl, App.IActiveDoc2);
-                    if (!isShow)
-                        {
-                            taskPaneView.TaskPaneToolbarButtonClicked += TaskPaneView_TaskPaneToolbarButtonClicked;
-                            taskPaneView.ShowView();
-                            isShow = true;
-                        }
-                    else
-                        {
-                            taskPaneView.TaskPaneToolbarButtonClicked -= TaskPaneView_TaskPaneToolbarButtonClicked;
-                            taskPaneView.HideView();
-                        }
-                    
-                    if (!getCtrl.GetData())
-                        {
-                            getCtrl = null;
-                            return;
-                        }
-                        sld = (SldWorks)App;
-                   
-                        sld.ActiveModelDocChangeNotify += Sld_ActiveModelDocChangeNotify;
-                        isShow = false;
-                    
-                    break;
-        
-                
-
-            }
-        }
-
         private int TaskPaneView_TaskPaneToolbarButtonClicked(int ButtonIndex)
         {
+
             switch ((ButtonIndex + 1))
             {
                 case 1:
-                    sld.ActiveModelDocChangeNotify -= Sld_ActiveModelDocChangeNotify;
-                    ActionControler actionContr = new ActionControler(sld);
-                    ctrl.Clear();
-                    ctrl.DataAcquisitionProcess();
-                    actionContr.RebuildTree();
-                    getCtrl.GetUpdatedData();
+                    GetControler getCtrl;
+                    getCtrl = new GetControler(ctrl, App.IActiveDoc2);
+                    if (!getCtrl.GetData())
+                    {
+                        getCtrl = null;
+                        return 0;
+                    }
+                    sld = (SldWorks)App;
+                    sld.ActiveModelDocChangeNotify += Sld_ActiveModelDocChangeNotify;
+                    st = StateApp.Read;
+                    getCtrl =null;
                     break;
                 case 2:
+                    sld.ActiveModelDocChangeNotify -= Sld_ActiveModelDocChangeNotify;
+                    ActionControler actionContr = new ActionControler(sld);
+                    ctrl.DataAcquisitionProcess();
+                    actionContr.RebuildTree();
+                    st = StateApp.Rebuild;
+                    actionContr = null;
+                    break;
+                break;
+                case 3:
+                    StatusCheckControler checkContrl=new StatusCheckControler(ctrl);
+                    st = StateApp.Refresh;
+                    break;
+
+                case 4:
                     ctrl.Clear();
                     Tree.ClearCollection();
                     getCtrl = null;
-                    break;
+                break;
 
             }
             return 1;
@@ -133,8 +128,10 @@ namespace RebuildComponentSW
 
         public override bool OnDisconnect()
         {
+            taskPaneView.TaskPaneToolbarButtonClicked -= TaskPaneView_TaskPaneToolbarButtonClicked;
             taskPaneView.DeleteView();
             return base.OnDisconnect();
+           
         }
        
     }

@@ -244,6 +244,29 @@ namespace RebuildComponentSW
             structuralNumbers.Clear();
             
         }
+        public static List<InfoView> GetInfo()
+        {
+            List<InfoView> infoViews = new List<InfoView>();
+            List<Model> models = new List<Model>();
+            models.AddRange(listComp);
+            models.AddRange(listDraw);
+            foreach (Model item in models)
+            {
+                infoViews.Add(new InfoView
+                {
+                    NameComp = item.CubyNumber,
+                    TypeComp = item.Section,
+                    Ext = item.Ext,
+                    Level = item.Level.ToString(),
+                    StPDM = item.File.CurrentState.Name.ToString(),
+                    State = item.condition.stateModel.ToString(),
+                    IsLocked = item.File.IsLocked.ToString(),
+
+                });
+            }
+            return infoViews;
+
+        }
 
     }
 }

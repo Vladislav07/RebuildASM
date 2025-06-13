@@ -97,6 +97,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="StatusCheckControler.cs" />
     <Compile Include="SW.cs" />
     <Compile Include="SWDocHandler.cs" />
     <Compile Include="SwAddIn.cs" />
