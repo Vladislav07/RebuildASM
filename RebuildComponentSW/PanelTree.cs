@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
 using System.IO;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RebuildComponentSW
 {
@@ -40,7 +41,7 @@ namespace RebuildComponentSW
         private byte[] GetImageData(int i)
         {
 
-            Image image;
+            System.Drawing.Image image;
             switch (i)
             {
                 case 0:
@@ -73,6 +74,7 @@ namespace RebuildComponentSW
             GenerateDataGridView();
             FillToListIsRebuild();
             GenerateNamedCheckBoxes();
+            SetStateForm();
             return true;
         }
         private void FillToListIsRebuild()
@@ -115,13 +117,14 @@ namespace RebuildComponentSW
 
                 dt.Rows.Add(dr);
             }
-
+            
+            this.Refresh();
         }
         private void GenerateDataGridView()
         {
             dataGridView = new DataGridView();
 
-            dataGridView.Location = new Point(0, 50);
+            dataGridView.Location = new Point(0, 70);
             dataGridView.BackgroundColor = Color.White;
             dataGridView.DefaultCellStyle.ForeColor = Color.Black;
             dataGridView.Width = this.Width;
@@ -175,7 +178,7 @@ namespace RebuildComponentSW
             chB_ToRebuild.Checked = true;
             chB_ToRebuild.Text = "To Rebuild";
             chB_ToRebuild.Name = "chB_ToRebuild";
-            chB_ToRebuild.Location = new Point(50, 30);
+            chB_ToRebuild.Location = new Point(50, 50);
             chB_ToRebuild.Size = new Size(100, 20);
             chB_ToRebuild.CheckedChanged += ChB_ToRebuild_CheckedChanged;
             this.Controls.Add(chB_ToRebuild);
@@ -183,7 +186,7 @@ namespace RebuildComponentSW
             chB_Clean = new CheckBox();
             chB_Clean.Text = "Clean";
             chB_Clean.Name = "chB_Clean";
-            chB_Clean.Location = new Point(170, 30);
+            chB_Clean.Location = new Point(150, 50);
             chB_Clean.Size = new Size(100, 20);
             chB_Clean.CheckedChanged += ChB_Clean_CheckedChanged;
             this.Controls.Add(chB_Clean);
@@ -191,7 +194,7 @@ namespace RebuildComponentSW
             checkBox1 = new CheckBox();
             checkBox1.Text = "Blocked";
             checkBox1.Name = "checkBox1";
-            checkBox1.Location = new Point(290, 30);
+            checkBox1.Location = new Point(250, 50);
             checkBox1.Size = new Size(100, 20);
             checkBox1.CheckedChanged += CheckBox1_CheckedChanged;
             this.Controls.Add(checkBox1);
@@ -199,7 +202,7 @@ namespace RebuildComponentSW
             chB_Impossible = new CheckBox();
             chB_Impossible.Text = "Manufacturing";
             chB_Impossible.Name = "chB_Impossible";
-            chB_Impossible.Location = new Point(410, 30);
+            chB_Impossible.Location = new Point(350, 50);
             chB_Impossible.Size = new Size(100, 20);
             chB_Impossible.CheckedChanged += ChB_Impossible_CheckedChanged;
             this.Controls.Add(chB_Impossible);
@@ -304,7 +307,7 @@ namespace RebuildComponentSW
             {
                 chB_Impossible.Enabled = false;
             }
-
+            this.Refresh();
 
         }
         private void RefreshForm()
@@ -313,14 +316,20 @@ namespace RebuildComponentSW
             FillToListIsRebuild();
             this.Refresh();
         }
-        private void GenerateLabelsAndProgressBar()
+        public void GenerateLabelMsgError()
         {
             lbMsg = new Label();
-            lbMsg.Text = "...";
-            lbMsg.Location = new Point(25, 25);
-            lbMsg.Width = 300;
+            lbMsg.Location = new Point(25, 5);
+            lbMsg.AutoSize = true; 
+            lbMsg.ForeColor = Color.Green;
+            lbMsg.Font = new Font(lbMsg.Font, FontStyle.Bold);
+            lbMsg.Font = new Font(lbMsg.Font.FontFamily, 12); 
+            lbMsg.TextAlign = ContentAlignment.TopLeft; 
             this.Controls.Add(lbMsg);
-
+        }
+        private void GenerateLabelsAndProgressBar()
+        {
+            GenerateLabelMsgError();
             progressBar1 = new System.Windows.Forms.ProgressBar();
             progressBar1.Location = new Point(50, 100);
             progressBar1.Width = 250;
@@ -329,13 +338,13 @@ namespace RebuildComponentSW
 
             lbStart = new Label();
             lbStart.Text = "0";
-            lbStart.Location = new Point(25, 100);
+            lbStart.Location = new Point(15, 100);
             this.Controls.Add(lbStart);
 
             lbCount = new Label();
 
             lbCount.Text = "0";
-            lbCount.Location = new Point(350, 100);
+            lbCount.Location = new Point(320, 100);
             this.Controls.Add(lbCount);
 
             lbNumber = new Label();
@@ -352,13 +361,22 @@ namespace RebuildComponentSW
             lbCount.Dispose();
             lbNumber.Dispose();
         }
+        public void DestroyGridView()
+        {
+            dataGridView.Dispose();
+            chB_ToRebuild.Dispose();
+            chB_Clean.Dispose();
+            checkBox1.Dispose();
+            chB_Impossible.Dispose();
+            this.Refresh();
+        }
         public void Notifacation(int typeEvent, MsgInfo msg)
         {
              switch (typeEvent)
              {
                  case 0:       //Error
                  
-                     this.lbMsg.Text = msg.errorMsg;
+                     this.lbMsg.Text = msg.errorMsg;                 
                      lbMsg.ForeColor = Color.Red;
 
                      break;
@@ -369,17 +387,25 @@ namespace RebuildComponentSW
                      break;
                  case 2:      //BeginOperation
                      lbMsg.ForeColor = Color.Green;
-                    this.lbMsg.Text = msg.typeOperation;
+                     this.lbMsg.Text = msg.typeOperation;
                      this.progressBar1.Maximum = msg.countStep;
                      this.progressBar1.Minimum = 0;
+                     this.lbStart.Text = "0";
                      this.lbCount.Text = msg.countStep.ToString();
                      this.Refresh();
                      break;
                  case 3:      //StepOperation
                      this.lbStart.Text = msg.currentStep.ToString();
-                     this.progressBar1.Value = msg.currentStep;
+                    try
+                        {
+                           this.progressBar1.Value = msg.currentStep;
+                        }
+                        catch (Exception)
+                        {
+                        
+                        }
                      this.lbNumber.Text = msg.numberCuby;
-                    this.Refresh();
+                     this.Refresh();
                     break;
                  default:
                      break;
@@ -388,12 +414,9 @@ namespace RebuildComponentSW
         }
         public void Clear()
         {
-            dt.Dispose();
-            dataGridView.Dispose();
-            chB_ToRebuild.Dispose();
-            chB_Clean.Dispose();
-            checkBox1.Dispose();
-            chB_Impossible.Dispose(); 
+            Controls.Clear();
+            dt.Clear();
+  
         }
     
     }

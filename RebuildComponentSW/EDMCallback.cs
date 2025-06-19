@@ -14,6 +14,7 @@ namespace RebuildComponentSW
         public void ProgressBegin(EdmProgressType eType, EdmUnlockEvent eEvent, int lSteps)
         {
             MsgInfo info = new MsgInfo("",true, "", "CheckIn files", lSteps);
+
             PDM.NotifyOperation(2, info);
         }
 
@@ -38,6 +39,7 @@ namespace RebuildComponentSW
             MsgInfo info = new MsgInfo();
             info.typeOperation = "Finish CheckIn";
             info.countStep = 0;
+            info.currentStep = 0;
             PDM.NotifyOperation(2, info);
         }
 

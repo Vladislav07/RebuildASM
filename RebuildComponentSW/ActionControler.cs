@@ -14,8 +14,10 @@ namespace RebuildComponentSW
     public class ActionControler
     {
         SldWorks swApp;
-        public ActionControler(SldWorks app)            
+        private PanelTree ctrl;
+        public ActionControler(PanelTree panelTree, SldWorks app)            
         {
+            ctrl = panelTree;
             swApp = app;
             PDM.NotifyPDM += PDM_NotifyPDM;
         }
@@ -23,14 +25,16 @@ namespace RebuildComponentSW
 
         public void RebuildTree()
         {
-
+            
+            ctrl.DestroyGridView();
+            ctrl.DataAcquisitionProcess();
             bool isClose = swApp.CloseAllDocuments(true);
-             RebuildTreeLoopLevel();         
+            RebuildTreeLoopLevel();         
         }
 
         private void PDM_NotifyPDM(int stage, MsgInfo msg)
         {
-            
+            ctrl.Notifacation(stage, msg);
         }
 
 
@@ -90,16 +94,18 @@ namespace RebuildComponentSW
                 PDM.CockSelList(list.Count);
                 group.ToList().ForEach(d => d.AddItemToSelList());
                 PDM.DocBatchUnLock();
-
             }
         }
 
         private void loopFilesToRebuild(List<string> listFiles)
         {
-            listFiles.ForEach(file => OpenFile(file));
+             // NotifyBeginRebuild(listFiles.Count, "Opening and rebuilding a file");
+              listFiles.ForEach(file => { 
+              bool res =  OpenFile(file);
+            });
         }
 
-        private void OpenFile(string item)
+        private bool OpenFile(string item)
         {
             ModelDoc2 swModelDoc = default(ModelDoc2);
             int errors = 0;
@@ -138,19 +144,22 @@ namespace RebuildComponentSW
                 if (swModelDoc == null)
                 {
                     MsgInfo msgInfo = new MsgInfo();
-                    //msgInfo.errorMsg=errors.n
+                    string cubyName=Path.GetFileNameWithoutExtension(fileName);
+                    msgInfo.errorMsg = "Error opening file: " + cubyName;
                     msgInfo.numberCuby = fileName;
-                    return;
+                    ctrl.Notifacation(0, msgInfo);
+                    return false;
                 }
-                  
+                   // NotifyStepOperation(fileName);
                     RefreshFile(swModelDoc);
                     swApp.CloseDoc(fileName);
   
-
+                  return true;
             }
             catch (Exception error)
             {
-                MessageBox.Show(error.ToString());
+                error.Data.Add("swOpenFile", fileName);
+                throw error;
 
             }
         }
@@ -166,6 +175,26 @@ namespace RebuildComponentSW
             swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
             
  
+        }
+        private void NotifyBeginRebuild(int count, string nameOper)
+        {
+            y = 1;
+            MsgInfo msgInfo = new MsgInfo();
+            msgInfo.typeOperation = nameOper;
+            msgInfo.countStep = count;
+            ctrl.Notifacation(2, msgInfo);
+
+        }
+        int y;
+        private void NotifyStepOperation(string file)
+        {
+
+            MsgInfo msgInfo = new MsgInfo();
+            string numberCuby = Path.GetFileName(file);
+            msgInfo.numberCuby = numberCuby;
+            msgInfo.countStep = y;
+            ctrl.Notifacation(3, msgInfo);
+            y++;
         }
 
     }

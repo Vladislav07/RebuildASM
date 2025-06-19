@@ -31,6 +31,7 @@ namespace RebuildComponentSW
             MsgInfo info = new MsgInfo();
             info.typeOperation = "Finish CheckOut";
             info.countStep = 0;
+            info.currentStep = 0;
             PDM.NotifyOperation(2, info);
         }
 
@@ -46,7 +47,11 @@ namespace RebuildComponentSW
 
         public bool ReportFailure(int lFileID, string bsPath, int hError, string bsDetails)
         {
-            throw new NotImplementedException();
+            MsgInfo info = new MsgInfo();
+            info.errorMsg=bsDetails;
+            info.numberCuby= Path.GetFileName(bsPath);
+            PDM.NotifyOperation(0, info);
+            return true;
         }
     }
 }

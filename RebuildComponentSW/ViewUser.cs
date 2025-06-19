@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RebuildComponentSW
 {
-    public struct ViewUser
+/*    public struct ViewUser
     {
         internal string NameComp { get; set; }
         internal string TypeComp { get; set; }
@@ -22,7 +22,7 @@ namespace RebuildComponentSW
         internal string DrawVersRev { get; set; }
         internal string DrawNeedRebuild { get; set; }
         internal string DrawIsLocked { get; set; }
-    }
+    }*/
     public struct InfoView
     {
         internal string NameComp { get; set; }

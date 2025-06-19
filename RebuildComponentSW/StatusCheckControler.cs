@@ -14,7 +14,8 @@ namespace RebuildComponentSW
         }
        
         public bool GetUpdatedData()
-        {
+        {  
+            ctrl.DestroyGridView();
             ctrl.DataAcquisitionProcess();
             Tree.RefreshFileFromPDM();
             Tree.CompareVersions();

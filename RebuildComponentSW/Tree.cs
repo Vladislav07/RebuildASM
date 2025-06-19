@@ -123,7 +123,7 @@ namespace RebuildComponentSW
             int level_ = 0;
             var uniqueModelByGroup = ModelTree
             .GroupBy(pair => pair.Key.Count(o => o == s))
-            .Select(group => group.Select(g => g.Value).Distinct().ToList()).ToList();
+            .Select(group => group.Select(g => g.Value).Distinct().ToList());
 
             foreach (var item in uniqueModelByGroup)
             {
@@ -200,7 +200,7 @@ namespace RebuildComponentSW
             mdata.currentStep = i;
             NotifyTree.Invoke(3,mdata);
         }
-        public static List<ViewUser> JoinCompAndDraw()
+/*        public static List<ViewUser> JoinCompAndDraw()
         {
             List<Part> compList = Tree.listComp;
             List<Drawing> drawList = Tree.listDraw;
@@ -234,7 +234,7 @@ namespace RebuildComponentSW
 
 
             return lv;
-        }
+        }*/
         public static void ClearCollection()
         {
             listComp.Clear();

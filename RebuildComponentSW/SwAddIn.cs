@@ -39,9 +39,8 @@ namespace RebuildComponentSW
         public override bool OnConnect()
         {         
              taskPaneView = (TaskpaneView)CreateTaskPane<PanelTree>(out ctrl);
-             taskPaneView.AddStandardButton((int)swTaskPaneBitmapsOptions_e.swTaskPaneBitmapsOptions_Back, "Read");
+             taskPaneView.AddStandardButton((int)swTaskPaneBitmapsOptions_e.swTaskPaneBitmapsOptions_Options, "Read");
              taskPaneView.AddStandardButton((int)swTaskPaneBitmapsOptions_e.swTaskPaneBitmapsOptions_Ok,"Rebuild");
-             taskPaneView.AddStandardButton((int)swTaskPaneBitmapsOptions_e.swTaskPaneBitmapsOptions_Next, "Update");
              taskPaneView.AddStandardButton((int)swTaskPaneBitmapsOptions_e.swTaskPaneBitmapsOptions_Close, "Close");
              st=StateApp.None;
              SetState();
@@ -54,76 +53,107 @@ namespace RebuildComponentSW
             switch ((int)st)
             {
                 case 0:
+                    taskPaneView.SetButtonState(0, true);
                     taskPaneView.SetButtonState(1, false);
-                    taskPaneView.SetButtonState(2, true);
-                    taskPaneView.SetButtonState(3, true);
-                    taskPaneView.SetButtonState(4, true);
+                    taskPaneView.SetButtonState(2, false);
                     break;
                 case 1:
-                    taskPaneView.SetButtonState(1, true);
-                    taskPaneView.SetButtonState(2, false);
-                    taskPaneView.SetButtonState(3, true);
-                    taskPaneView.SetButtonState(4, false);
-                    break;
-                case 2:
+                case 3:
+                    taskPaneView.SetButtonState(0, false);
                     taskPaneView.SetButtonState(1, true);
                     taskPaneView.SetButtonState(2, true);
-                    taskPaneView.SetButtonState(3, false);
-                    taskPaneView.SetButtonState(4, false);
                     break;
-
+                case 2:
+                    taskPaneView.SetButtonState(0, false);
+                    taskPaneView.SetButtonState(1, false);
+                    taskPaneView.SetButtonState(2, true);
+                    break;
             }
         }
 
 
-        private int Sld_ActiveModelDocChangeNotify()
-        {
-            ctrl.Clear();
-            Tree.ClearCollection();
-            return 0;
-        }
-
 
         private int TaskPaneView_TaskPaneToolbarButtonClicked(int ButtonIndex)
         {
-
+            DSldWorksEvents_ActiveDocChangeNotifyEventHandler activeDocChangeNotifyAddin = Sld_ActiveDocChangeNotify;
             switch ((ButtonIndex + 1))
             {
                 case 1:
-                    GetControler getCtrl;
-                    getCtrl = new GetControler(ctrl, App.IActiveDoc2);
-                    if (!getCtrl.GetData())
+                    sld = (SldWorks)App;
+                    ModelDoc2 model = (ModelDoc2)sld.ActiveDoc;
+                    swDocumentTypes_e swDocType;
+                   // ctrl.GenerateLabelMsgError();
+                    ctrl.DataAcquisitionProcess();
+                    if (model == null)
                     {
-                        getCtrl = null;
+                        ctrl.Notifacation(0, new MsgInfo("Could not acquire an active document"));
                         return 0;
                     }
-                    sld = (SldWorks)App;
-                    sld.ActiveModelDocChangeNotify += Sld_ActiveModelDocChangeNotify;
+                    swDocType = (swDocumentTypes_e)model.GetType();
+
+
+                    if (swDocType != swDocumentTypes_e.swDocASSEMBLY)
+                    {
+                        ctrl.Notifacation(0, new MsgInfo("This program only works with assemblies"));
+                        return 0;
+                    }
+                    GetControler getCtrl;
+                    getCtrl = new GetControler(ctrl, App.IActiveDoc2);
+
+                    if (!getCtrl.GetData())
+                    {
+                        getCtrl.Dispose();
+                        getCtrl=null;
+                        return 0;
+                        
+                    }                  
+                    sld.ActiveDocChangeNotify += activeDocChangeNotifyAddin;
                     st = StateApp.Read;
+                    SetState();
+                    getCtrl.Dispose();
                     getCtrl =null;
                     break;
                 case 2:
-                    sld.ActiveModelDocChangeNotify -= Sld_ActiveModelDocChangeNotify;
-                    ActionControler actionContr = new ActionControler(sld);
-                    ctrl.DataAcquisitionProcess();
+
+                    sld.ActiveDocChangeNotify -= activeDocChangeNotifyAddin;
+                    ActionControler actionContr = new ActionControler(ctrl,sld);
                     actionContr.RebuildTree();
                     st = StateApp.Rebuild;
+                    SetState();
                     actionContr = null;
+                    StatusCheck();
                     break;
                 break;
                 case 3:
-                    StatusCheckControler checkContrl=new StatusCheckControler(ctrl);
-                    st = StateApp.Refresh;
-                    break;
-
-                case 4:
                     ctrl.Clear();
                     Tree.ClearCollection();
+                    st = StateApp.None;
+                    SetState();
                     getCtrl = null;
                 break;
 
             }
             return 1;
+        }
+
+        private void StatusCheck()
+        {
+            ctrl.Clear();
+            StatusCheckControler checkContrl = new StatusCheckControler(ctrl);
+            checkContrl.GetUpdatedData();
+            st = StateApp.Refresh;
+            SetState();
+            checkContrl = null;
+            
+        }
+
+        private int Sld_ActiveDocChangeNotify()
+        {
+            ctrl.Clear();
+            Tree.ClearCollection();
+            st = StateApp.None;
+            SetState();
+            return 0;
         }
 
         public override bool OnDisconnect()
@@ -133,6 +163,7 @@ namespace RebuildComponentSW
             return base.OnDisconnect();
            
         }
+        
        
     }
 }

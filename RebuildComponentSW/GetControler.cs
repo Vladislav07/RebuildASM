@@ -4,24 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 
 namespace RebuildComponentSW
 {
    
-    public class GetControler
+    public class GetControler:IDisposable
     {
         private PanelTree ctrl;
         private SW sw;
         ModelDoc2 model;
         public GetControler(PanelTree panelTree, ModelDoc2 _model)
         {
-
-            ctrl = panelTree;
-            ctrl.DataAcquisitionProcess();
-           
+            
             model = _model;
-           
+            ctrl = panelTree;
             sw = new SW(model);
+           // ctrl.DataAcquisitionProcess();
             sw.NotifySW += Sw_NotifySW;
             PDM.NotifyPDM += PDM_NotifyPDM;
             Tree.NotifyTree += Tree_NotifyTree;
@@ -44,23 +43,30 @@ namespace RebuildComponentSW
 
         public bool GetData()
         {
-            if (model == null)
+            try
             {
-                ctrl.Notifacation(0, new MsgInfo("Could not acquire an active document"));
-                return false;
+                sw.ReadTree();
+                Tree.SearchParentFromChild();
+                Tree.FillCollection();
+                Tree.ReverseTree();
+                Tree.GetInfoPDM();
+                Tree.CompareVersions();
+                ctrl.userView = Tree.GetInfo();
+                ctrl.LoadData();
+                ctrl.Refresh();
+                return true;
             }
-            sw.ReadTree();
-            Tree.SearchParentFromChild();
-            Tree.FillCollection();
-            Tree.ReverseTree();
-            Tree.GetInfoPDM();
-            Tree.CompareVersions();
-            ctrl.userView = Tree.GetInfo();
-            ctrl.LoadData();
-            return true;
+            catch (Exception)
+            {
+
+               return false;
+            }
+         
         }
-      
 
-
+        public void Dispose()
+        {
+            sw = null;
+        }
     }
 }
